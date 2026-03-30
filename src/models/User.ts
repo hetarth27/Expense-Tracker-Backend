@@ -55,8 +55,8 @@ UserSchema.methods.comparePassword = async function (
 // Remove password from JSON output
 UserSchema.set('toJSON', {
   transform: (_doc, ret) => {
-    delete ret.password;
-    return ret;
+    const { password, ...rest } = ret;
+    return rest;
   },
 });
 
