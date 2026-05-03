@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import mongoose from 'mongoose';
+import { createError } from '../middleware/errorHandler';
 import Expense from '../models/Expense';
 import { AuthRequest, ExpenseFilters } from '../types';
-import { createError } from '../middleware/errorHandler';
 
 // ─── Helper: Build date-range match ──────────────────────────────────────────
 const buildDateFilter = (
@@ -62,19 +62,26 @@ export const getExpenses = async (req: AuthRequest, res: Response): Promise<void
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-  const [expenses, total] = await Promise.all([
+  const [expenses, totalCount, totalAmount] = await Promise.all([
     Expense.find(matchQuery).sort({ date: -1 }).skip(skip).limit(limitNum).lean(),
     Expense.countDocuments(matchQuery),
+    Expense.aggregate([
+      { $match: matchQuery },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]),
   ]);
+
+  const totalAmountValue = totalAmount[0]?.total ?? 0;
 
   res.status(200).json({
     success: true,
     data: {
       expenses,
-      total,
+      total: totalCount,
+      totalAmount: totalAmountValue,
       page: pageNum,
       limit: limitNum,
-      totalPages: Math.ceil(total / limitNum),
+      totalPages: Math.ceil(totalCount / limitNum),
     },
   });
 };
