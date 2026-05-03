@@ -39,6 +39,7 @@ export const EXPENSE_CATEGORIES = [
   'Groceries',
   'Fruits & Vegetables',
   'Subscriptions',
+  'Vehicle Services',
   'Other',
 ] as const;
 
@@ -102,18 +103,12 @@ export interface DashboardInsights {
   recentExpenses: IExpense[];
 }
 
-// ─── API Response ─────────────────────────────────────────
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  error?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+// ─── Share Token ─────────────────────────────────────────
+export interface IShareToken extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  token: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

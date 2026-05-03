@@ -1,13 +1,14 @@
-import express, { Application } from 'express';
 import cors from 'cors';
+import express, { Application } from 'express';
+import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import rateLimit from 'express-rate-limit';
 
-import authRoutes from './routes/authRoutes';
-import expenseRoutes from './routes/expenseRoutes';
-import budgetRoutes from './routes/budgetRoutes';
 import { errorHandler, notFound } from './middleware/errorHandler';
+import authRoutes from './routes/authRoutes';
+import budgetRoutes from './routes/budgetRoutes';
+import expenseRoutes from './routes/expenseRoutes';
+import shareRoutes from './routes/shareRoutes';
 
 const app: Application = express();
 
@@ -55,6 +56,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/budgets', budgetRoutes);
+app.use('/api/share', shareRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
